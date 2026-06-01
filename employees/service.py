@@ -63,19 +63,6 @@ async def update_employee(db: AsyncSession, id: int, name: str, email: str, age:
     return updated_employee
 
 
-# async def update_employee(db:AsyncSession,id:int, name:str,email:str)->Employee:
-#     employee = await get_employee_ID(db,id)
-
-#     if not isinstance(name, str) or not name.strip():
-#         raise BadRequestException("name must be a non-empty string")
-#     if not isinstance(email, str) or not email.strip():
-#         # raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="email must be a non-empty string")
-#         raise BadRequestException("email must be a non-empty string")
-
-#     updated_employee = await employee_repo.update_employee(db,employee,name.strip(),email.strip())
-#     return updated_employee
-
-
 async def delete_employee(db: AsyncSession, id: int) -> Employee:
     employee = await get_employee_ID(db, id)
     deleted_employee = await employee_repo.delete_employee(db, employee)

@@ -48,11 +48,6 @@ class Employee(Entity):
         server_default=EmployeeRole.DEVELOPER.value,
     )
 
-    # departments: Mapped[list["Department"]] = relationship(
-    #     "Department",
-    #     secondary="employee_departments",
-    #     viewonly=True,
-    # )
     @property
     def departments(self):
         return [

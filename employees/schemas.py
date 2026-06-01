@@ -4,36 +4,6 @@ from addresses.schemas import AddressCreate, AddressResponse
 from departments.schemas import DepartmentResponse
 from models.employee import EmployeeRole
 
-# class AddressCreate(BaseModel):
-#     line1: str
-#     city: str
-#     postal_code: str
-#     country: str
-#     @field_validator("postal_code")
-#     @classmethod
-#     def validate_postal_code(cls,v:str)->str:
-#         if not v.isdigit():
-#             raise ValueError("Postal code must contain only digits(0-9)")
-#         return v
-
-#     @model_validator(mode="after")
-
-#     def postal_code_length_for_country(self):
-
-#         country = self.country.strip().upper()
-
-#         n = len(self.postal_code)
-
-#         if country in ("US", "USA") and n != 5:
-
-#             raise ValueError("US ZIP codes must be exactly 5 digits")
-
-#         elif country == "IN" and n != 6:
-
-#             raise ValueError("Indian PIN codes must be exactly 6 digits")
-
-#         return self
-
 
 class EmployeeCreate(BaseModel):
     model_config = ConfigDict(str_strip_whitespace=True, extra="forbid")

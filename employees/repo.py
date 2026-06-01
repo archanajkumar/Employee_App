@@ -53,18 +53,6 @@ async def get_by_email(db: AsyncSession, email: str) -> Employee | None:
 
 
 async def get_employee_ID(db: AsyncSession, id: int) -> Employee:
-    # stmt = select(Employee).where(Employee.id==id,Employee.deleted_at.is_(None)).options(
-    #         selectinload(Employee.addresses),
-    #         selectinload(Employee.departments),
-    #         with_loader_criteria(
-    #             Address,
-    #             Address.deleted_at.is_(None)
-    #         ),
-    #         with_loader_criteria(
-    #             Department,
-    #             Department.deleted_at.is_(None)
-    #         )
-    #     )
     stmt = (
         select(Employee)
         .where(Employee.id == id, Employee.deleted_at.is_(None))
@@ -79,13 +67,6 @@ async def get_employee_ID(db: AsyncSession, id: int) -> Employee:
     result = await db.scalars(stmt)
     employee = result.first()
     return employee
-
-
-# async def get_employee_ID(db:AsyncSession,id:int)->Employee:
-#     stmt = select(Employee).where(Employee.id==id,Employee.deleted_at.is_(None))
-#     result = await db.scalars(stmt)
-#     employee = result.first()
-#     return employee
 
 
 async def update_employee(db: AsyncSession, employee: Employee, name: str, email: str, age: int) -> Employee:
@@ -103,20 +84,6 @@ async def update_employee(db: AsyncSession, employee: Employee, name: str, email
     return employee
 
 
-# async def update_employee(db:AsyncSession,employee:Employee,name:str,email:str)->Employee:
-#     employee.name=name
-#     employee.email=email
-
-#     db.add(employee)
-#     try:
-#         await db.commit()
-#     except IntegrityError:
-#         await db.rollback()
-#         raise ConflictException(f"Email '{email.strip()}' is already in use")
-#     await db.refresh(employee)
-#     return employee
-
-
 async def delete_employee(db: AsyncSession, employee: Employee) -> Employee:
     employee.deleted_at = func.now()
     db.add(employee)
@@ -125,16 +92,3 @@ async def delete_employee(db: AsyncSession, employee: Employee) -> Employee:
     await db.commit()
     await db.refresh(employee)
     return employee
-
-    # await db.commit()
-    # await db.refresh(employee)
-
-    # stmt = select(Address).where(Address.employee_id==employee.id)
-    # result = await db.scalars(stmt)
-    # address = result.all()
-    # for add in address:
-    #     add.deleted_at=func.now()
-    # db.add(address)
-    # await db.commit()
-    # await db.refresh(address)
-    # return employee
