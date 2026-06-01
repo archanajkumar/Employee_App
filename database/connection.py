@@ -13,7 +13,7 @@ from sqlalchemy.orm import DeclarativeBase
 from config import settings
 
 
-#DATABASE_URL = "postgresql+asyncpg://postgres:postgres@localhost:5432/employee_db"
+# DATABASE_URL = "postgresql+asyncpg://postgres:postgres@localhost:5432/employee_db"
 
 
 class Base(DeclarativeBase):
@@ -28,10 +28,6 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
     """One AsyncSession per request; closed after the request."""
     async with AsyncSessionLocal() as session:
         yield session
-
-
-
-
 
 
 # from collections.abc import AsyncGenerator

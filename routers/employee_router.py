@@ -23,7 +23,7 @@
 #     for emp in employee:
 #         print(emp.to_api_dict())
 #     return [emp.to_api_dict() for emp in employee]
-    
+
 # @router.get("/{id}",status_code=status.HTTP_200_OK)
 # async def get_employee_byID(id:int, db: AsyncSession = Depends(get_db)):
 #     employee = await employee_service.get_employee_ID(db,id)
@@ -40,4 +40,4 @@
 # async def delete_employee(id:int, db: AsyncSession = Depends(get_db)):
 #     employee = await employee_service.delete_employee(db,id)
 #     return {"message": "Employee deleted","details": employee.to_api_dict()}
-    
+

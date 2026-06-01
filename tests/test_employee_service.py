@@ -22,11 +22,8 @@ async def test_create_employee_persists_the_record():
     session_factory = async_sessionmaker(bind=engine, class_=AsyncSession)
 
     async with session_factory() as db:
-        body = EmployeeCreate(
-            name="Ada", email="ada@example.com", age =20,address=None,password="secret123"
-        )
-        employee = await  employee_service.create(db, body.name,body.email, body.age, body.password, body.address)
-        
+        body = EmployeeCreate(name="Ada", email="ada@example.com", age=20, address=None, password="secret123")
+        employee = await employee_service.create(db, body.name, body.email, body.age, body.password, body.address)
 
         assert employee.id is not None
         assert employee.name == "Ada"
@@ -36,7 +33,6 @@ async def test_create_employee_persists_the_record():
         await conn.run_sync(Base.metadata.drop_all)
 
     await engine.dispose()
-
 
 
 # from sqlalchemy import create_engine
@@ -59,7 +55,6 @@ async def test_create_employee_persists_the_record():
 
 
 #     db = sessionmaker(bind=engine)()
-
 
 
 #     # ── ACT ───────────────────────────────────────────────

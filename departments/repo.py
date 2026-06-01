@@ -1,11 +1,11 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy import select,func
+from sqlalchemy import select, func
 from models import Department
 from exceptions import ConflictException
 
 
-async def create(name:str, db:AsyncSession)->Department:
+async def create(name: str, db: AsyncSession) -> Department:
     dept = Department(name=name)
     db.add(dept)
     try:
@@ -16,19 +16,22 @@ async def create(name:str, db:AsyncSession)->Department:
     await db.refresh(dept)
     return dept
 
-async def get_all_departments(db:AsyncSession)->Department:
+
+async def get_all_departments(db: AsyncSession) -> Department:
     stmt = select(Department).where(Department.deleted_at.is_(None))
     result = await db.scalars(stmt)
     dept = result.all()
     return dept
 
-async def get_dept_byId(dept_id:int, db:AsyncSession)->Department:
-    stmt = select(Department).where(Department.id==dept_id,Department.deleted_at.is_(None))
+
+async def get_dept_byId(dept_id: int, db: AsyncSession) -> Department:
+    stmt = select(Department).where(Department.id == dept_id, Department.deleted_at.is_(None))
     result = await db.scalars(stmt)
     dept = result.first()
     return dept
 
-async def update_department(dept:Department, name:str, db:AsyncSession)->Department:
+
+async def update_department(dept: Department, name: str, db: AsyncSession) -> Department:
     dept.name = name
     db.add(dept)
     try:
@@ -39,7 +42,8 @@ async def update_department(dept:Department, name:str, db:AsyncSession)->Departm
     await db.refresh(dept)
     return dept
 
-async def delete_department(dept:Department, db:AsyncSession)->Department:
+
+async def delete_department(dept: Department, db: AsyncSession) -> Department:
     dept.deleted_at = func.now()
     db.add(dept)
     await db.commit()

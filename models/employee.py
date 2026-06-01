@@ -2,16 +2,15 @@
 Employee entity — ORM mapped class for table `employees`.
 """
 
-from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
-from sqlalchemy import DateTime, Integer, String, func
-from sqlalchemy.orm import Mapped, mapped_column,relationship
+from sqlalchemy import Integer, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from database import Base
-from models.entity import Entity,datetime_to_iso
+from models.entity import Entity, datetime_to_iso
+
 # from models import Address
-from typing import TYPE_CHECKING  
+from typing import TYPE_CHECKING
 import enum
 from sqlalchemy import Enum
 
@@ -19,7 +18,6 @@ from sqlalchemy import Enum
 if TYPE_CHECKING:
     from models.address import Address
     from models.employee_department import EmployeeDepartment
-    from models.department import Department
 
 
 class EmployeeRole(str, enum.Enum):
@@ -28,30 +26,27 @@ class EmployeeRole(str, enum.Enum):
     DEVELOPER = "Developer"
     HR = "HR"
 
+
 class Employee(Entity):
     __abstract__ = False
     __tablename__ = "employees"
 
-   
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     email: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
     age: Mapped[int] = mapped_column(Integer, nullable=True)
-    password_hash : Mapped[str]= mapped_column(String(255),nullable=False)
-    
-    addresses: Mapped[list["Address"]] = relationship(
-        "Address",
-        back_populates="employee"
+    password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
+
+    addresses: Mapped[list["Address"]] = relationship("Address", back_populates="employee")
+    employee_departments: Mapped[list["EmployeeDepartment"]] = relationship(
+        "EmployeeDepartment",
+        back_populates="employee",
     )
-    employee_departments :Mapped[list["EmployeeDepartment"]] = relationship(
-        "EmployeeDepartment",back_populates="employee",
-    )
-    
+
     role: Mapped[EmployeeRole] = mapped_column(
-        Enum(EmployeeRole, name="employeerole",values_callable=lambda enum_cls: [e.value for e in enum_cls]),
+        Enum(EmployeeRole, name="employeerole", values_callable=lambda enum_cls: [e.value for e in enum_cls]),
         nullable=False,
         server_default=EmployeeRole.DEVELOPER.value,
-        )
-
+    )
 
     # departments: Mapped[list["Department"]] = relationship(
     #     "Department",
@@ -63,12 +58,9 @@ class Employee(Entity):
         return [
             link.department
             for link in self.employee_departments
-            if (
-                link.deleted_at is None
-                and link.department is not None
-                and link.department.deleted_at is None
-            )
+            if (link.deleted_at is None and link.department is not None and link.department.deleted_at is None)
         ]
+
     def to_api_dict(self) -> dict[str, Any]:
         """JSON-friendly representation (ISO 8601 for timestamps)."""
         return {
@@ -78,11 +70,7 @@ class Employee(Entity):
             "created_at": datetime_to_iso(self.created_at),
             "updated_at": datetime_to_iso(self.updated_at),
             "deleted_at": datetime_to_iso(self.deleted_at),
-            "addresses": [
-                address.to_api_dict()
-                for address in self.addresses
-                if address.deleted_at is None
-            ],
+            "addresses": [address.to_api_dict() for address in self.addresses if address.deleted_at is None],
             "departments": [
                 employee_department.department.to_api_dict()
                 for employee_department in self.employee_departments

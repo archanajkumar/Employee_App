@@ -1,5 +1,4 @@
-from fastapi import FastAPI,Request
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI
 import logging
 from middleware import configure_middleware
 from employees.router import router as employee_router
@@ -9,6 +8,7 @@ from departments.router import router as dept_router
 from employee_departments.router import router as emp_dept_router
 from exceptions.handlers import register_exception_handlers
 from config import settings
+
 # from config import APP_ENV
 logging.basicConfig(
     level=logging.INFO,
@@ -32,13 +32,15 @@ app.include_router(dept_router)
 app.include_router(emp_dept_router)
 
 
-@app.get("/",tags=["Employee App"])
+@app.get("/", tags=["Employee App"])
 def root():
     return {"Welcome to employee app"}
+
 
 @app.get("/health", tags=["Health"])
 def health_check():
     return {"status": "healthy", "env": settings.app_env}
+
 
 # @app.exception_handler(NotFoundException)
 # async def not_found_exception_handler(request:Request,exc:NotFoundException):
@@ -46,7 +48,6 @@ def health_check():
 #         status_code=404,
 #         content={"detail":str(exc)}
 #     )
-
 
 
 # @dataclass
@@ -62,7 +63,7 @@ def health_check():
 #     last_name: str
 #     email: str
 
-#@app.get("/employee",status_code=200,response_model=PublicPost)
+# @app.get("/employee",status_code=200,response_model=PublicPost)
 # def get_employee():
 #     return _employees
 
@@ -83,4 +84,3 @@ def health_check():
 # @app.get("/employee/{id}",status_code=200,response_model=PublicPost)
 # def get_employee_byID(id):
 #     return _employees[int(id)]
-

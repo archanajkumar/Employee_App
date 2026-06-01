@@ -6,8 +6,6 @@
 # from sqlalchemy import select,func
 
 
-
-
 # async def create(db:AsyncSession, name:str, email:str)->Employee:
 #     db_employee = Employee(name=name, email=email)
 #     db.add(db_employee)
@@ -24,7 +22,7 @@
 #     result = await db.scalars(stmt)
 #     employee = result.all()
 #     return employee
-    
+
 # async def get_employee_ID(db:AsyncSession,id:int)->Employee:
 #     stmt = select(Employee).where(Employee.id==id,Employee.deleted_at.is_(None))
 #     result = await db.scalars(stmt)
@@ -34,7 +32,7 @@
 # async def update_employee(db:AsyncSession,employee:Employee,name:str,email:str)->Employee:
 #     employee.name=name
 #     employee.email=email
-    
+
 #     db.add(employee)
 #     try:
 #         await db.commit()

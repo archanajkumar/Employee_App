@@ -31,13 +31,13 @@
 #         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="name must be a non-empty string")
 #     if not isinstance(email, str) or not email.strip():
 #         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="email must be a non-empty string")
-    
+
 #     updated_employee = await employee_repo.update_employee(db,employee,name.strip(),email.strip())
 #     return updated_employee
 
 # async def delete_employee(db:AsyncSession,id:int)->Employee:
 #     employee = await employee_repo.get_employee_ID(db,id)
-    
+
 #     if not employee:
 #         raise HTTPException(404, "Employee not found")
 #     deleted_employee = await employee_repo.delete_employee(db,employee)
