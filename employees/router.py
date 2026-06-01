@@ -95,5 +95,5 @@ async def update_employee(id: int, body: EmployeeUpdate, db: AsyncSession = Depe
 
 @router.delete("/{id}", dependencies=[Depends(require_role(EmployeeRole.HR))])
 async def delete_employee(id: int, db: AsyncSession = Depends(get_db)):
-    employee = await employee_service.delete_employee(db, id)
+    await employee_service.delete_employee(db, id)
     return {"message": "Employee deleted"}

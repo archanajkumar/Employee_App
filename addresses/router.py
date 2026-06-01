@@ -41,11 +41,11 @@ async def update_address(emp_id: int, address_id: int, body: AddressCreate, db: 
 
 @router.delete("/{address_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_address(address_id: int, db: AsyncSession = Depends(get_db)):
-    address = await address_service.delete_address(address_id, db)
+    await address_service.delete_address(address_id, db)
     return {f"Address with id {address_id} is deleted"}
 
 
 @router.delete("/employee/{emp_id}/address/{address_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_employee_address(emp_id: int, address_id: int, db: AsyncSession = Depends(get_db)):
-    address = await address_service.delete_employee_address(emp_id, address_id, db)
+    await address_service.delete_employee_address(emp_id, address_id, db)
     return {"message": f"Address with id {address_id} of employee {emp_id} is deleted"}

@@ -50,7 +50,7 @@ async def delete_address(address_id: int, db: AsyncSession):
 
 
 async def delete_employee_address(emp_id: int, address_id: int, db: AsyncSession) -> Address:
-    emp = await emp_service.get_employee_ID(db, emp_id)
+    await emp_service.get_employee_ID(db, emp_id)
     address = await get_address_byId(address_id, db)
     if address.employee_id != emp_id:
         raise BadRequestException(f"employee {emp_id} does not have address with id {address_id}")

@@ -35,5 +35,5 @@ async def update_department(dept_id: int, body: DepartmentCreate, db: AsyncSessi
 
 @router.delete("/{dept_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_department(dept_id: int, db: AsyncSession = Depends(get_db)):
-    dept = await dept_service.delete_department(dept_id, db)
+    await dept_service.delete_department(dept_id, db)
     return {f"Department with id {dept_id} deleted"}

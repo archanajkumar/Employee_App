@@ -17,5 +17,5 @@ async def attach(emp_id: int, dept_id: int, db: AsyncSession = Depends(get_db)):
 
 @router.delete("/{emp_id}/departments/{dept_id}")
 async def dettach(emp_id: int, dept_id: int, db: AsyncSession = Depends(get_db)):
-    emp_dept = await emp_dept_service.dettach(emp_id, dept_id, db)
+    await emp_dept_service.dettach(emp_id, dept_id, db)
     return {"message": "detached"}
