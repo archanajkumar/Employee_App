@@ -9,7 +9,9 @@ from employees.schemas import EmployeeCreate,EmployeeResponse,EmployeeResponseBy
 from auth.dependencies import get_current_user,require_role
 from auth.schemas import TokenPayload
 from models.employee import EmployeeRole
+import logging
 
+logger = logging.getLogger(__name__)
 
 # router = APIRouter(prefix="/employee", tags=["Employees"],dependencies=[Depends(get_current_user)])
 router = APIRouter(prefix="/employee", tags=["Employees"])

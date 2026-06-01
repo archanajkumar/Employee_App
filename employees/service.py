@@ -9,6 +9,8 @@ from auth.utils import hash_password
 from addresses.schemas import AddressCreate
 import addresses.repo as address_repo
 from models.employee import EmployeeRole
+import logging
+logger = logging.getLogger(__name__)
 async def create(db: AsyncSession, name: str, email: str,age:int, password:str,address:AddressCreate,role:EmployeeRole) -> Employee:
     hashed = hash_password(password)
     if not isinstance(name, str) or not name.strip():
@@ -29,6 +31,7 @@ async def get_employee(db:AsyncSession)->Employee:
 async def get_employee_byname(db:AsyncSession,name:str):
     employee = await employee_repo.get_employee_byname(db,name)
     if not employee:
+        # logger.warning(f"User: {name} not found")
         raise NotFoundException("Employee not found")
     return employee
 
