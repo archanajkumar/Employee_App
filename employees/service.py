@@ -9,6 +9,7 @@ from auth.utils import hash_password
 from addresses.schemas import AddressCreate
 import addresses.repo as address_repo
 from models.employee import EmployeeRole
+import employee_departments.service as emp_dept_service
 import logging
 
 logger = logging.getLogger(__name__)
@@ -66,5 +67,5 @@ async def update_employee(db: AsyncSession, id: int, name: str, email: str, age:
 async def delete_employee(db: AsyncSession, id: int) -> Employee:
     employee = await get_employee_ID(db, id)
     deleted_employee = await employee_repo.delete_employee(db, employee)
-
+    await emp_dept_service.delete_by_empid(employee.id, db)
     return deleted_employee

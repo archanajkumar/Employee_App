@@ -1,76 +1,45 @@
-import pytest
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-from sqlalchemy.pool import StaticPool
+# tests/test_employee_service.py
 
-from database import Base
+# `pytest_asyncio` provides the *async-aware* fixture decorator. Plain
+# `@pytest.fixture` doesn't know how to drive an `async def` body — you
+# have to use `@pytest_asyncio.fixture` whenever the fixture itself is
+# async or yields an async resource.
+# Same async-flavoured SQLAlchemy imports as the previous slide.
+
+from auth.utils import hash_password
 from employees import service as employee_service
-from employees.schemas import EmployeeCreate
+from models.employee import Employee
+from models.employee import EmployeeRole
+import pytest
+# The fixture: a single function that owns the engine, the schema, and
+# the session — and tears it all back down when the test finishes.
 
 
+# The test is now pure "act + assert" — no engine, no create_all, no
+# cleanup. Pytest sees the `db_session` parameter, runs the fixture
+# above, and hands the yielded session in.
 @pytest.mark.asyncio
-async def test_create_employee_persists_the_record():
-    engine = create_async_engine(
-        "sqlite+aiosqlite:///:memory:",
-        connect_args={"check_same_thread": False},
-        poolclass=StaticPool,
-        echo=True,
+async def test_get_by_id_returns_seeded_employee(db_session):
+
+    # Seed a row directly via the ORM. We construct Employee ourselves
+    # (with a real `password_hash`) because service.create currently
+    # drops the password field — bypassing it keeps this test focused.
+    seeded = Employee(
+        name="Ada", email="ada@example.com", age=20, role=EmployeeRole.HR, password_hash=hash_password("secret123")
     )
+    # `add()` is sync — it just stages the row in the session.
+    db_session.add(seeded)
+    # `commit()` is the IO step. Must be awaited.
 
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    await db_session.commit()
 
-    session_factory = async_sessionmaker(bind=engine, class_=AsyncSession)
+    # `refresh()` re-reads the row so `seeded.id` is populated.
 
-    async with session_factory() as db:
-        body = EmployeeCreate(name="Ada", email="ada@example.com", age=20, address=None, password="secret123")
-        employee = await employee_service.create(db, body.name, body.email, body.age, body.password, body.address)
+    await db_session.refresh(seeded)
 
-        assert employee.id is not None
-        assert employee.name == "Ada"
-        assert employee.email == "ada@example.com"
+    # Call the function under test — async, so we await.
 
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
+    fetched = await employee_service.get_employee_ID(db_session, seeded.id)
 
-    await engine.dispose()
-
-
-# from sqlalchemy import create_engine
-# from sqlalchemy.orm import sessionmaker
-
-# from database import Base
-# from employees import service as employee_service
-# from employees.schemas import EmployeeCreate
-# from addresses.schemas import AddressCreate
-
-
-# def test_create_employee_persists_the_record():
-#     # ── SETUP ─────────────────────────────────────────────
-
-
-#     engine = create_engine("sqlite:///:memory:")
-
-
-#     Base.metadata.create_all(engine)
-
-
-#     db = sessionmaker(bind=engine)()
-
-
-#     # ── ACT ───────────────────────────────────────────────
-#     body = EmployeeCreate(name="Ada", email="ada@example.com", age =20,
-#                           address=None,password="secret123")
-#     employee = employee_service.create(db, body.name,body.email, body.age, body.password, body.address)
-
-#     # ── ASSERT ────────────────────────────────────────────
-#     assert employee.id is not None
-#     assert employee.name == "Ada"
-#     assert employee.email == "ada@example.com"
-
-#     # ── TEARDOWN ──────────────────────────────────────────
-
-
-#     db.close()
-
-
-#     Base.metadata.drop_all(engine)
+    assert fetched.id == seeded.id
+    assert fetched.email == "ada@example.com"

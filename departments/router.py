@@ -1,4 +1,4 @@
-from departments.schemas import DepartmentCreate, DepartmentResponse, DepartmentResponseById
+from departments.schemas import DepartmentCreate, DepartmentResponse, DepartmentResponseById, DepartmentEmployeeResponse
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db
@@ -41,6 +41,16 @@ async def get_all_departments(db: AsyncSession = Depends(get_db)):
 async def get_dept_byId(dept_id: int, db: AsyncSession = Depends(get_db)):
     dept = await dept_service.get_dept_byId(dept_id, db)
     return dept
+
+
+@router.get(
+    "/{dept_id}/employees",
+    response_model=list[DepartmentEmployeeResponse],
+    dependencies=[Depends(require_role(EmployeeRole.HR, EmployeeRole.UI, EmployeeRole.UX, EmployeeRole.DEVELOPER))],
+)
+async def get_department_employees(dept_id: int, db: AsyncSession = Depends(get_db)):
+    emp = await dept_service.get_department_employees(dept_id, db)
+    return emp
 
 
 @router.put("/{dept_id}", response_model=DepartmentResponseById, dependencies=[Depends(require_role(EmployeeRole.HR))])

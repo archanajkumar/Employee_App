@@ -22,3 +22,30 @@ async def dettach(emp_id: int, dept_id: int, db: AsyncSession) -> EmployeeDepart
         raise NotFoundException("employee-department record not found")
     emp_dept = await emp_dept_repo.dettach(emp_dept, db)
     return emp_dept
+
+
+async def get_by_emp_id(emp_id: int, db: AsyncSession) -> EmployeeDepartment:
+    emp_dept = await emp_dept_repo.get_by_empid(emp_id, db)
+    if not emp_dept:
+        raise NotFoundException("record not found")
+    return emp_dept
+
+
+async def get_by_did(dept_id: int, db: AsyncSession) -> EmployeeDepartment:
+    emp_dept = await emp_dept_repo.get_by_did(dept_id, db)
+    if not emp_dept:
+        raise NotFoundException("record not found")
+    return emp_dept
+
+
+async def delete_by_empid(emp_id: int, db: AsyncSession) -> EmployeeDepartment:
+    emp_dept = await get_by_emp_id(emp_id, db)
+    emp_dept = await emp_dept_repo.delete_by_empid(emp_dept, db)
+    return emp_dept
+
+
+async def delete_by_did(dept_id: int, db: AsyncSession) -> EmployeeDepartment:
+    emp_dept = await get_by_did(dept_id, db)
+
+    emp_dept = await emp_dept_repo.delete_by_did(emp_dept, db)
+    return emp_dept

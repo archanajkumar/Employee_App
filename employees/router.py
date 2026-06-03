@@ -16,7 +16,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 # router = APIRouter(prefix="/employee", tags=["Employees"],dependencies=[Depends(get_current_user)])
-router = APIRouter(prefix="/employee", tags=["Employees"])
+router = APIRouter(prefix="/employees", tags=["Employees"])
 
 
 @router.post(

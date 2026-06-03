@@ -1,5 +1,6 @@
 from pydantic import BaseModel, ConfigDict, Field
 from datetime import datetime
+from models.employee import EmployeeRole
 
 
 class DepartmentCreate(BaseModel):
@@ -17,3 +18,16 @@ class DepartmentResponse(BaseModel):
 class DepartmentResponseById(DepartmentResponse):
     created_at: datetime
     updated_at: datetime
+
+
+class EmployeeBasicResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    name: str
+    email: str
+    role: EmployeeRole
+
+
+class DepartmentEmployeeResponse(DepartmentResponse):
+    employees: list[EmployeeBasicResponse] = []

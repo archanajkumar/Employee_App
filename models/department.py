@@ -16,6 +16,14 @@ class Department(Entity):
         "EmployeeDepartment", back_populates="department"
     )
 
+    @property
+    def employees(self):
+        return [
+            link.employee
+            for link in self.employee_departments
+            if (link.deleted_at is None and link.employee is not None and link.employee.deleted_at is None)
+        ]
+
     def to_api_dict(self) -> dict[str, Any]:
         return {
             "id": self.id,
