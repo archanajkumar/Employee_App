@@ -1,8 +1,8 @@
 from pydantic import BaseModel, Field, ConfigDict
-from datetime import datetime
+from datetime import datetime, date
 from addresses.schemas import AddressCreate, AddressResponse
 from departments.schemas import DepartmentResponse
-from models.employee import EmployeeRole
+from models.employee import EmployeeRole, EmployeeStatus
 
 
 class EmployeeCreate(BaseModel):
@@ -14,6 +14,8 @@ class EmployeeCreate(BaseModel):
     address: AddressCreate | None = None
     password: str = Field(min_length=6)
     role: EmployeeRole
+    status: EmployeeStatus
+    experience: int | None = Field(ge=0)
 
 
 class EmployeeResponse(BaseModel):
@@ -23,6 +25,9 @@ class EmployeeResponse(BaseModel):
     email: str
     age: int | None = None
     role: EmployeeRole
+    status: EmployeeStatus
+    experience: int | None = None
+    joining_date: date
 
 
 class EmployeeResponseById(EmployeeResponse):
@@ -38,3 +43,4 @@ class EmployeeUpdate(BaseModel):
     name: str = Field(min_length=1)
     email: str
     age: int | None = Field(ge=0, le=150)
+    status: EmployeeStatus

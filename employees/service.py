@@ -8,15 +8,25 @@ from exceptions import NotFoundException, BadRequestException
 from auth.utils import hash_password
 from addresses.schemas import AddressCreate
 import addresses.repo as address_repo
-from models.employee import EmployeeRole
+from models.employee import EmployeeRole, EmployeeStatus
 import employee_departments.service as emp_dept_service
+from datetime import date
+
 import logging
 
 logger = logging.getLogger(__name__)
 
 
 async def create(
-    db: AsyncSession, name: str, email: str, age: int, password: str, address: AddressCreate, role: EmployeeRole
+    db: AsyncSession,
+    name: str,
+    email: str,
+    age: int,
+    password: str,
+    address: AddressCreate,
+    role: EmployeeRole,
+    status: EmployeeStatus,
+    experience: int,
 ) -> Employee:
     hashed = hash_password(password)
     if not isinstance(name, str) or not name.strip():
@@ -24,15 +34,17 @@ async def create(
     if not isinstance(email, str) or not email.strip():
         # raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="email must be a non-empty string")
         raise BadRequestException("email must be a non-empty string")
-    employee = await employee_repo.create(db, name.strip(), email.strip(), age, role, password_hash=hashed)
+    employee = await employee_repo.create(
+        db, name.strip(), email.strip(), age, role, status, experience, password_hash=hashed
+    )
     if address:
         address = await address_repo.create(db, address, employee.id)
     employee = await employee_repo.get_employee_ID(db, employee.id)
     return employee
 
 
-async def get_employee(db: AsyncSession) -> Employee:
-    employee = await employee_repo.get_employee(db)
+async def get_employee(db: AsyncSession, status: EmployeeStatus | None = None) -> Employee:
+    employee = await employee_repo.get_employee(db, status)
     return employee
 
 
@@ -51,7 +63,9 @@ async def get_employee_ID(db: AsyncSession, id: int) -> Employee:
     return employee
 
 
-async def update_employee(db: AsyncSession, id: int, name: str, email: str, age: int) -> Employee:
+async def update_employee(
+    db: AsyncSession, id: int, name: str, email: str, age: int, status: EmployeeStatus
+) -> Employee:
     employee = await get_employee_ID(db, id)
 
     if not isinstance(name, str) or not name.strip():
@@ -60,7 +74,17 @@ async def update_employee(db: AsyncSession, id: int, name: str, email: str, age:
         # raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="email must be a non-empty string")
         raise BadRequestException("email must be a non-empty string")
 
-    updated_employee = await employee_repo.update_employee(db, employee, name, email, age)
+    if employee.status == EmployeeStatus.PROBATION and status == EmployeeStatus.ACTIVE:
+        today = date.today()
+
+        months = (today.year - employee.joining_date.year) * 12 + (today.month - employee.joining_date.month)
+
+        if today.day < employee.joining_date.day:
+            months -= 1
+
+        if months < 3:
+            raise BadRequestException("Employee must complete at least 3 months of probation before becoming Active")
+    updated_employee = await employee_repo.update_employee(db, employee, name, email, age, status)
     return updated_employee
 
 

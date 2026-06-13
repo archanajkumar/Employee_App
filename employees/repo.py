@@ -6,11 +6,22 @@ from models import Employee, Address, Department, EmployeeDepartment
 from sqlalchemy import select, func, update
 from exceptions import ConflictException
 from sqlalchemy.orm import selectinload, with_loader_criteria
-from models.employee import EmployeeRole
+from models.employee import EmployeeRole, EmployeeStatus
 
 
-async def create(db: AsyncSession, name: str, email: str, age: int, role: EmployeeRole, password_hash: str) -> Employee:
-    db_employee = Employee(name=name, email=email, age=age, role=role, password_hash=password_hash)
+async def create(
+    db: AsyncSession,
+    name: str,
+    email: str,
+    age: int,
+    role: EmployeeRole,
+    status: EmployeeStatus,
+    experience: int,
+    password_hash: str,
+) -> Employee:
+    db_employee = Employee(
+        name=name, email=email, age=age, role=role, status=status, experience=experience, password_hash=password_hash
+    )
     db.add(db_employee)
     try:
         await db.commit()
@@ -21,8 +32,10 @@ async def create(db: AsyncSession, name: str, email: str, age: int, role: Employ
     return db_employee
 
 
-async def get_employee(db: AsyncSession) -> Employee:
+async def get_employee(db: AsyncSession, status: EmployeeStatus | None = None) -> Employee:
     stmt = select(Employee).where(Employee.deleted_at.is_(None))
+    if status:
+        stmt = stmt.where(Employee.status == status)
     result = await db.scalars(stmt)
     employee = result.all()
     return employee
@@ -69,10 +82,13 @@ async def get_employee_ID(db: AsyncSession, id: int) -> Employee:
     return employee
 
 
-async def update_employee(db: AsyncSession, employee: Employee, name: str, email: str, age: int) -> Employee:
+async def update_employee(
+    db: AsyncSession, employee: Employee, name: str, email: str, age: int, status: EmployeeStatus
+) -> Employee:
     employee.name = name
     employee.email = email
     employee.age = age
+    employee.status = status
 
     db.add(employee)
     try:

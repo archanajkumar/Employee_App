@@ -10,7 +10,7 @@ from database import get_db
 import employees.service as employee_service
 from employees.schemas import EmployeeCreate, EmployeeResponse, EmployeeResponseById, EmployeeUpdate
 from auth.dependencies import require_role
-from models.employee import EmployeeRole
+from models.employee import EmployeeRole, EmployeeStatus
 import logging
 
 logger = logging.getLogger(__name__)
@@ -32,7 +32,9 @@ async def create_employee(body: EmployeeCreate, db: AsyncSession = Depends(get_d
     password = body.password
     address = body.address
     role = body.role
-    employee = await employee_service.create(db, name, email, age, password, address, role)
+    status = body.status
+    experience = body.experience
+    employee = await employee_service.create(db, name, email, age, password, address, role, status, experience)
     return employee
 
 
@@ -48,9 +50,9 @@ async def create_employee(body: EmployeeCreate, db: AsyncSession = Depends(get_d
     response_model=list[EmployeeResponse],
     dependencies=[Depends(require_role(EmployeeRole.HR, EmployeeRole.UI, EmployeeRole.UX, EmployeeRole.DEVELOPER))],
 )
-async def get_all_employees(db: AsyncSession = Depends(get_db)):
+async def get_all_employees(status: EmployeeStatus | None = None, db: AsyncSession = Depends(get_db)):
     # breakpoint()
-    employee = await employee_service.get_employee(db)
+    employee = await employee_service.get_employee(db, status)
     return [emp for emp in employee]
 
 
@@ -81,7 +83,8 @@ async def update_employee(id: int, body: EmployeeUpdate, db: AsyncSession = Depe
     name = body.name
     email = body.email
     age = body.age
-    employee = await employee_service.update_employee(db, id, name, email, age)
+    status = body.status
+    employee = await employee_service.update_employee(db, id, name, email, age, status)
     return employee
 
 

@@ -3,8 +3,9 @@ Employee entity — ORM mapped class for table `employees`.
 """
 
 from typing import Any
+from datetime import date
 
-from sqlalchemy import Integer, String
+from sqlalchemy import Integer, String, Date
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from models.entity import Entity, datetime_to_iso
@@ -27,6 +28,12 @@ class EmployeeRole(str, enum.Enum):
     HR = "HR"
 
 
+class EmployeeStatus(str, enum.Enum):
+    PROBATION = "Probation"
+    ACTIVE = "Active"
+    INACTIVE = "Inactive"
+
+
 class Employee(Entity):
     __abstract__ = False
     __tablename__ = "employees"
@@ -42,11 +49,19 @@ class Employee(Entity):
         back_populates="employee",
     )
 
+    status: Mapped[EmployeeStatus] = mapped_column(
+        Enum(EmployeeStatus, name="employeestatus", values_callable=lambda enum_cls: [e.value for e in enum_cls]),
+        nullable=False,
+        server_default=EmployeeStatus.PROBATION.value,
+    )
+
     role: Mapped[EmployeeRole] = mapped_column(
         Enum(EmployeeRole, name="employeerole", values_callable=lambda enum_cls: [e.value for e in enum_cls]),
         nullable=False,
         server_default=EmployeeRole.DEVELOPER.value,
     )
+    experience: Mapped[int] = mapped_column(Integer, nullable=False)
+    joining_date: Mapped[date] = mapped_column(Date, nullable=False)
 
     @property
     def departments(self):
