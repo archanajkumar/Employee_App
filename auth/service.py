@@ -23,5 +23,5 @@ async def refresh(refresh_token: str):
         raise UnauthorizedException("invalid refresh token")
     if token.get("type") != "refresh":
         raise UnauthorizedException("invalid refreh token")
-    access_token = create_access_token({"id": token["id"], "email": token["email"]})
+    access_token = create_access_token({"id": token["id"], "email": token["email"], "role": token["role"]})
     return access_token

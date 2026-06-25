@@ -25,6 +25,8 @@ services:
     container_name: employee_server_container
     ports:
       - "8000:8000"
+    volumes:
+      - ./uploads:/app/uploads
     depends_on:
       - postgres
     env_file:
@@ -39,8 +41,7 @@ services:
         - path: ./uv.lock
           action: rebuild
     command: ["uv", "run", "uvicorn", "main:app", "--port", "8000","--host","0.0.0.0", "--reload"]
-      
+
 
 volumes:
   postgres_data:
-

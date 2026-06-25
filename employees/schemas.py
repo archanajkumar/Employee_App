@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field, ConfigDict
 from datetime import datetime, date
 from addresses.schemas import AddressCreate, AddressResponse
 from departments.schemas import DepartmentResponse
+from employee_documents.schemas import EmployeeDocumentResponse
 from models.employee import EmployeeRole, EmployeeStatus
 
 
@@ -16,6 +17,7 @@ class EmployeeCreate(BaseModel):
     role: EmployeeRole
     status: EmployeeStatus
     experience: int | None = Field(ge=0)
+    joining_date: date
 
 
 class EmployeeResponse(BaseModel):
@@ -36,6 +38,7 @@ class EmployeeResponseById(EmployeeResponse):
     updated_at: datetime
     addresses: list[AddressResponse] = []
     departments: list[DepartmentResponse] = []
+    document: EmployeeDocumentResponse | None = None
 
 
 class EmployeeUpdate(BaseModel):
@@ -44,3 +47,5 @@ class EmployeeUpdate(BaseModel):
     email: str
     age: int | None = Field(ge=0, le=150)
     status: EmployeeStatus
+    experience: int = Field(ge=0)
+    joining_date: date

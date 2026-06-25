@@ -34,7 +34,10 @@ async def create_employee(body: EmployeeCreate, db: AsyncSession = Depends(get_d
     role = body.role
     status = body.status
     experience = body.experience
-    employee = await employee_service.create(db, name, email, age, password, address, role, status, experience)
+    joining_date = body.joining_date
+    employee = await employee_service.create(
+        db, name, email, age, password, address, role, status, experience, joining_date
+    )
     return employee
 
 
@@ -84,7 +87,9 @@ async def update_employee(id: int, body: EmployeeUpdate, db: AsyncSession = Depe
     email = body.email
     age = body.age
     status = body.status
-    employee = await employee_service.update_employee(db, id, name, email, age, status)
+    experience = body.experience
+    joining_date = body.joining_date
+    employee = await employee_service.update_employee(db, id, name, email, age, status, experience, joining_date)
     return employee
 
 

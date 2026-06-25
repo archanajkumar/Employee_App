@@ -5,5 +5,6 @@ from models.entity import Entity
 from models.address import Address
 from models.department import Department
 from models.employee_department import EmployeeDepartment
+from models.employee_document import EmployeeDocument
 
-__all__ = ["Employee", "Entity", "Address", "Department", "EmployeeDepartment"]
+__all__ = ["Employee", "Entity", "Address", "Department", "EmployeeDepartment", "EmployeeDocument"]

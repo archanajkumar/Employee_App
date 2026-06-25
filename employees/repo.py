@@ -2,11 +2,12 @@
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
-from models import Employee, Address, Department, EmployeeDepartment
+from models import Employee, Address, Department, EmployeeDepartment, EmployeeDocument
 from sqlalchemy import select, func, update
 from exceptions import ConflictException
 from sqlalchemy.orm import selectinload, with_loader_criteria
 from models.employee import EmployeeRole, EmployeeStatus
+from datetime import date
 
 
 async def create(
@@ -17,10 +18,18 @@ async def create(
     role: EmployeeRole,
     status: EmployeeStatus,
     experience: int,
+    joining_date,
     password_hash: str,
 ) -> Employee:
     db_employee = Employee(
-        name=name, email=email, age=age, role=role, status=status, experience=experience, password_hash=password_hash
+        name=name,
+        email=email,
+        age=age,
+        role=role,
+        status=status,
+        experience=experience,
+        joining_date=joining_date,
+        password_hash=password_hash,
     )
     db.add(db_employee)
     try:
@@ -70,6 +79,7 @@ async def get_employee_ID(db: AsyncSession, id: int) -> Employee:
         select(Employee)
         .where(Employee.id == id, Employee.deleted_at.is_(None))
         .options(
+            selectinload(Employee.document),
             selectinload(Employee.addresses),
             selectinload(Employee.employee_departments).selectinload(EmployeeDepartment.department),
             with_loader_criteria(Address, Address.deleted_at.is_(None)),
@@ -83,12 +93,21 @@ async def get_employee_ID(db: AsyncSession, id: int) -> Employee:
 
 
 async def update_employee(
-    db: AsyncSession, employee: Employee, name: str, email: str, age: int, status: EmployeeStatus
+    db: AsyncSession,
+    employee: Employee,
+    name: str,
+    email: str,
+    age: int,
+    status: EmployeeStatus,
+    experience: int,
+    joining_date: date,
 ) -> Employee:
     employee.name = name
     employee.email = email
     employee.age = age
     employee.status = status
+    employee.experience = experience
+    employee.joining_date = joining_date
 
     db.add(employee)
     try:
@@ -105,6 +124,9 @@ async def delete_employee(db: AsyncSession, employee: Employee) -> Employee:
     db.add(employee)
 
     await db.execute(update(Address).where(Address.employee_id == employee.id).values(deleted_at=func.now()))
+    await db.execute(
+        update(EmployeeDocument).where(EmployeeDocument.employee_id == employee.id).values(deleted_at=func.now())
+    )
     await db.commit()
     await db.refresh(employee)
     return employee

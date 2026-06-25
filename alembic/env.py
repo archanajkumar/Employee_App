@@ -14,7 +14,11 @@ import asyncio
 # makes `--autogenerate` think a table should be DROPPED. This is the #1 autogenerate gotcha.
 
 import models.employee
-import models.address  # noqa: F401
+import models.address
+import models.department
+import models.employee_department
+import models.employee_document  # noqa: F401
+
 
 config = context.config
 

@@ -19,6 +19,7 @@ from sqlalchemy import Enum
 if TYPE_CHECKING:
     from models.address import Address
     from models.employee_department import EmployeeDepartment
+    from models.employee_document import EmployeeDocument
 
 
 class EmployeeRole(str, enum.Enum):
@@ -62,6 +63,8 @@ class Employee(Entity):
     )
     experience: Mapped[int] = mapped_column(Integer, nullable=False)
     joining_date: Mapped[date] = mapped_column(Date, nullable=False)
+
+    document: Mapped["EmployeeDocument"] = relationship("EmployeeDocument", back_populates="employee", uselist=False)
 
     @property
     def departments(self):

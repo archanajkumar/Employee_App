@@ -6,7 +6,9 @@ from auth.router import router as auth_router
 from addresses.router import router as address_router
 from departments.router import router as dept_router
 from employee_departments.router import router as emp_dept_router
+from employee_documents.router import router as employee_document_router
 from exceptions.handlers import register_exception_handlers
+from fastapi.staticfiles import StaticFiles
 from config import settings
 
 # from config import APP_ENV
@@ -30,6 +32,8 @@ app.include_router(auth_router)
 app.include_router(address_router)
 app.include_router(dept_router)
 app.include_router(emp_dept_router)
+app.include_router(employee_document_router)
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 
 @app.get("/", tags=["Employee App"])
